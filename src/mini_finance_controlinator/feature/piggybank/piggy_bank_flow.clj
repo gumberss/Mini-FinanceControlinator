@@ -3,9 +3,8 @@
   )
 
 (defn create! [piggy-bank]
-  (if
-    (p.db/existing? piggy-bank)
-    (throw (ex-info "Piggy banks already exist" {:piggy-bank piggy-bank}))
+  (if (p.db/existing? piggy-bank)
+    (throw (ex-info "Piggy bank already exist" {:piggy-bank piggy-bank}))
     (p.db/create! piggy-bank)))
 
 (defn get-all

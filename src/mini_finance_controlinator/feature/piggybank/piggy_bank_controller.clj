@@ -8,11 +8,11 @@
   (try
     {:status  200
      :headers {"Content-Type" "application/json"}
-     :body    (-> (p.flow/create! (req :params)))}
+     :body    (-> (req :params) (p.flow/create!))}
     (catch Exception e
       {:status  500                                         ; 500 or 400??
        :headers {"Content-Type" "application/json"}
-       :body    (-> (ex-message e))})
+       :body    {:message (ex-message e)}})
     )
   )
 
@@ -21,10 +21,10 @@
   (try
     {:status  200
      :headers {"Content-Type" "application/json"}
-     :body    (json/write-str (p.flow/get-all))}
+     :body    (-> (p.flow/get-all) json/write-str)}
     (catch Exception e
       {:status  500                                         ; 500 or 400??
        :headers {"Content-Type" "application/json"}
-       :body    (-> (ex-message e))})
+       :body    {:message (ex-message e)}})
     )
   )
