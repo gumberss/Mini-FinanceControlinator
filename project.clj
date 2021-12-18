@@ -13,7 +13,8 @@
                  [compojure "1.6.1"]
                  [http-kit "2.3.0"]
                  [lynxeyes/dotenv "1.0.2"]
-                 [org.clojure/data.json "2.4.0"]]
+                 [org.clojure/data.json "2.4.0"]
+                 [com.datomic/datomic-pro "0.9.5951"]]
   :main ^:skip-aot mini-finance-controlinator.handler
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all} :dev {:main mini-finance-controlinator.handler/-dev-main}})

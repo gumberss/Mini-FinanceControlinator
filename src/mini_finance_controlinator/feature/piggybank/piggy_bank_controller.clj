@@ -1,10 +1,12 @@
 (ns mini-finance-controlinator.feature.piggybank.piggy-bank-controller
   (:require [mini-finance-controlinator.feature.piggybank.piggy-bank-flow :as p.flow]
             [clojure.data.json :as json])
+  (:use clojure.pprint)
   )
 
 (defn create-piggy-bank
   [req]
+  ;(pprint (type (get (req :params) "piggy-bank/saved-value")) )
   (try
     {:status  200
      :headers {"Content-Type" "application/json"}
