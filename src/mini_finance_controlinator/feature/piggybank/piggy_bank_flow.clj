@@ -9,7 +9,7 @@
 
 (defn create! [data]
   (let [piggy-bank (into {} (map key-string->keyword data))]
-    (if (p.db/existing? piggy-bank)
+    (if (p.db/existing? (p.db/db-datomic) piggy-bank)
       (throw (ex-info "Piggy bank already exist" {:piggy-bank piggy-bank}))
       (p.db/create! (p.db/connection) piggy-bank))))
 

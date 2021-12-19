@@ -2,6 +2,8 @@
   (:require [datomic.api :as d])
   (:use clojure.pprint))
 
+(defn uuid [] (java.util.UUID/randomUUID))
+
 (def default-db-uri "datomic:dev://localhost:4334/finance-controlinator")
 
 (defn- delete-database []
@@ -20,39 +22,29 @@
   ([conn] (d/db conn))
   ([conn time] (d/as-of (d/db conn) time)))
 
+(defn existing?
+  ([db {name :piggy-bank/name}]
 
-(def db (atom {:piggy-banks {}}))
-
-(defn existing? [{name :name}]
-  (->> @db
-       (:piggy-banks)
-       vals
-       (map :name)
-       (some #(= % name))))
-
-(defn create!
-  [{
-    _1  :name
-    _2  :description
-    _3  :saved-value
-    :as record}]
-  (let [id (-> @db :piggy-banks count inc)
-        new-piggy-bank (assoc record :id id)]
-    (swap! db update-in [:piggy-banks] assoc id new-piggy-bank)))
+   (let [piggy-banks-with-same-name (d/q '[:find ?e
+                                           :in $ ?name
+                                           :where [?e :piggy-bank/name ?name]]
+                                         db name)]
+     (some number? (reduce concat piggy-banks-with-same-name)))))
 
 (defn create! [conn entity]
-  (pprint @(d/transact conn [entity])))
+  (pprint @(d/transact conn [(assoc entity :piggy-bank/id (uuid))])))
 
 (defn update!
   [id update-piggy-bank-fn]
   (swap! db update-in [:piggy-banks id] update-piggy-bank-fn))
 
 (defn get-all
-  []
-  (-> @db
-      :piggy-banks
-      vals))
-
+  ([]
+   (get-all (db-datomic)))
+  ([db]
+   (let [result (d/q '[:find (pull ?e [*])
+                       :where [?e :piggy-bank/id]] db)]
+     (first result))))
 
 (def schema [
              {
