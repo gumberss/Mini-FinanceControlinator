@@ -30,3 +30,14 @@
        :body    {:message (ex-message e)}})
     )
   )
+
+(defn update-piggy-bank
+  [req]
+  (try
+    {:status  200
+     :headers {"Content-Type" "application/json"}
+     :body    (-> (req :params) (p.flow/update!))}
+    (catch Exception e
+      {:status  500                                         ; 500 or 400??
+       :headers {"Content-Type" "application/json"}
+       :body    {:message (ex-message e)}})))

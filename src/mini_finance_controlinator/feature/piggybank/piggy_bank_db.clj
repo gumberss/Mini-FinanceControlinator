@@ -22,21 +22,29 @@
   ([conn] (d/db conn))
   ([conn time] (d/as-of (d/db conn) time)))
 
+(defn find-by-name [db name]
+  (d/q '[:find ?e
+         :in $ ?name
+         :where [?e :piggy-bank/name ?name]]
+       db name))
+
 (defn existing?
   ([db {name :piggy-bank/name}]
 
-   (let [piggy-banks-with-same-name (d/q '[:find ?e
-                                           :in $ ?name
-                                           :where [?e :piggy-bank/name ?name]]
-                                         db name)]
+   (let [piggy-banks-with-same-name (find-by-name db name)]
      (some number? (reduce concat piggy-banks-with-same-name)))))
 
 (defn create! [conn entity]
-  (pprint @(d/transact conn [(assoc entity :piggy-bank/id (uuid))])))
+  (:tempids @(d/transact conn [(assoc entity :piggy-bank/id (uuid))])))
 
+; its inserting data without changes?
 (defn update!
-  [id update-piggy-bank-fn]
-  (swap! db update-in [:piggy-banks id] update-piggy-bank-fn))
+  [piggy-bank]
+  (let [
+        db-piggy-bank (find-by-name (db-datomic) (:piggy-bank/name piggy-bank))
+        piggy-bank-id (ffirst db-piggy-bank)
+        result @(d/transact (connection) (map #(into [:db/add piggy-bank-id] %) piggy-bank))]
+    (:tempids result)))
 
 (defn get-all
   ([]
@@ -44,7 +52,7 @@
   ([db]
    (let [result (d/q '[:find (pull ?e [*])
                        :where [?e :piggy-bank/id]] db)]
-     (first result))))
+     (map first result))))
 
 (def schema [
              {

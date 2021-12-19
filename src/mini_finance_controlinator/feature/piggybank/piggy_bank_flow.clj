@@ -16,3 +16,9 @@
 (defn get-all
   []
   (p.db/get-all))
+
+(defn update! [data]
+  (let [piggy-bank (into {} (map key-string->keyword data))]
+    (if (p.db/existing? (p.db/db-datomic) piggy-bank)
+      (p.db/update! piggy-bank)
+      (throw (ex-info "Piggy bank not found by name" {:piggy-bank/name piggy-bank})))))

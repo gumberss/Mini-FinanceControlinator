@@ -18,7 +18,8 @@
 (defroutes app-routes
            (GET "/" [req] (str req))
            (GET "/piggy-bank" [req] p.controller/get-all-piggy-banks)
-           (POST "/piggy-bank" [] p.controller/create-piggy-bank))
+           (POST "/piggy-bank" [] p.controller/create-piggy-bank)
+           (PUT "/piggy-bank" [] p.controller/update-piggy-bank))
 
 (defn -main
   "Production"
