@@ -1,5 +1,6 @@
 (ns mini-finance-controlinator.feature.piggybank.piggy-bank-db
-  (:require [datomic.api :as d])
+  (:require [datomic.api :as d]
+            [clj-time.coerce :as tc])
   (:use clojure.pprint))
 
 (defn uuid [] (java.util.UUID/randomUUID))
@@ -20,7 +21,7 @@
 (defn db-datomic
   ([] (d/db (connection default-db-uri)))
   ([conn] (d/db conn))
-  ([conn time] (d/as-of (d/db conn) time)))
+  ([conn date] (d/as-of (d/db conn) date)))
 
 (defn find-by-name [db name]
   (d/q '[:find ?e
@@ -30,7 +31,6 @@
 
 (defn existing?
   ([db {name :piggy-bank/name}]
-
    (let [piggy-banks-with-same-name (find-by-name db name)]
      (some number? (reduce concat piggy-banks-with-same-name)))))
 
@@ -51,8 +51,17 @@
    (get-all (db-datomic)))
   ([db]
    (let [result (d/q '[:find (pull ?e [*])
-                       :where [?e :piggy-bank/id]] db)]
+                       :where [?e :piggy-bank/id]]
+                     db)]
      (map first result))))
+
+(defn get-all-by-date
+  [string-date]
+  (let [
+        date (clojure.instant/read-instant-date string-date)
+        db (d/since (db-datomic (connection)) date)
+        result (get-all db)]
+    result))
 
 (def schema [
              {

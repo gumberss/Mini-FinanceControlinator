@@ -18,6 +18,7 @@
 (defroutes app-routes
            (GET "/" [req] (str req))
            (GET "/piggy-bank" [req] p.controller/get-all-piggy-banks)
+           (GET "/piggy-bank/date" [req] p.controller/get-all-by-date-piggy-banks)
            (POST "/piggy-bank" [] p.controller/create-piggy-bank)
            (PUT "/piggy-bank" [] p.controller/update-piggy-bank))
 
