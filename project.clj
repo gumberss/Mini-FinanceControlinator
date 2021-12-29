@@ -16,5 +16,6 @@
                  [org.clojure/data.json "2.4.0"]
                  [com.datomic/datomic-pro "0.9.5951"]]
   :main ^:skip-aot mini-finance-controlinator.handler
+  :uberjar-name "mini-finance-controlinator.jar"
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all} :dev {:main mini-finance-controlinator.handler/-dev-main}})
